@@ -18,18 +18,22 @@
 
 -define(SERVER, ?MODULE).
 
+
+-ifdef(use_specs).
+-spec start_link/0 :: () -> {ok, pid()} | ignore | {error, Error::term()}.
+%% @doc
+%%  Add a chron job to be supervised
+-spec add_job/2 :: (erlcron:job_ref(), erlcron:job()) -> erlcron:job_ref().
+-endif.
+
 %%%===================================================================
 %%% API functions
 %%%===================================================================
 
--spec start_link() -> {ok, pid()} | ignore | {error, Error::term()}.
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 
-%% @doc
-%%  Add a chron job to be supervised
--spec add_job(erlcron:job_ref(), erlcron:job()) -> erlcron:job_ref().
 add_job(JobRef, Task) ->
     {ok, _} = supervisor:start_child(?SERVER, [JobRef, Task]),
     JobRef.

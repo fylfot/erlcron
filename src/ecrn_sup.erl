@@ -14,11 +14,14 @@
 
 -define(SERVER, ?MODULE).
 
+-ifdef(use_specs).
+-spec start_link/0 :: () -> {ok, Pid::term()} | ignore | {error, Error::term()}.
+-endif.
+
 %%%===================================================================
 %%% API functions
 %%%===================================================================
 
--spec start_link() -> {ok, Pid::term()} | ignore | {error, Error::term()}.
 start_link() ->
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 

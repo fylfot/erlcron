@@ -27,29 +27,33 @@
 -record(state, {reference_datetime :: calendar:datetime(),
                 datetime_at_reference :: erlcron:seconds()}).
 
+-ifdef(use_specs).
+
+-spec start_link/0 :: () -> {ok, pid()} | ignore | {error, Error::term()}.
+-spec cancel/1 :: (erlcron:job_ref()) -> ok.
+-spec datetime/0 :: () -> {calendar:datetime(), erlcron:seconds()}.
+%% @doc sets the date-time for the erlcron
+-spec set_datetime/1 :: (calendar:datetime()) -> ok.
+%% @doc sets the date-time with the erlcron on all nodes
+-spec multi_set_datetime/2 :: ([node()], calendar:datetime()) -> ok.
+-endif.
+
 %%%===================================================================
 %%% API
 %%%===================================================================
 
--spec start_link() -> {ok, pid()} | ignore | {error, Error::term()}.
 start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
--spec cancel(erlcron:job_ref()) -> ok | undefined.
 cancel(AlarmRef) ->
     gen_server:call(?SERVER, {cancel, AlarmRef}).
 
--spec datetime() -> {calendar:datetime(), erlcron:seconds()}.
 datetime() ->
     gen_server:call(?SERVER, get_datetime).
 
-%% @doc sets the date-time for the erlcron
--spec set_datetime(calendar:datetime()) -> ok.
 set_datetime(DateTime={_,_}) ->
     gen_server:call(?SERVER, {set_datetime, DateTime}, infinity).
 
-%% @doc sets the date-time with the erlcron on all nodes
--spec multi_set_datetime([node()], calendar:datetime()) -> ok.
 multi_set_datetime(Nodes, DateTime={_,_}) ->
     gen_server:multi_call(Nodes, ?SERVER, {set_datetime, DateTime}).
 
@@ -112,5 +116,5 @@ internal_cancel(AlarmRef) ->
         undefined ->
             undefined;
         {ok, [Pid]} ->
-            ecrn_agent:cancel(Pid)
+            {ok, ecrn_agent:cancel(Pid)}
     end.

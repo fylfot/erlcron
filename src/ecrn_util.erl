@@ -9,10 +9,13 @@
 
 -export([epoch_seconds/0]).
 
+-ifdef(use_specs).
+-spec epoch_seconds/0 :: () -> erlcron:seconds().
+-endif.
+
 %%%===================================================================
 %%% API
 %%%===================================================================
--spec epoch_seconds() -> erlcron:seconds().
 epoch_seconds() ->
     {Megasecs, Secs, Microsecs} = os:timestamp(),
     erlang:trunc((Megasecs * 1000000) + Secs + (Microsecs / 1000000)).
